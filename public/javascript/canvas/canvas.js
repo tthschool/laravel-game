@@ -1,70 +1,79 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elastic Collision</title>
-<style>
-    canvas {
-        border: 1px solid black;
-    }
-</style>
-</head>
-<body>
-<canvas id="myCanvas" width="800" height="600"></canvas>
+const canvas = document.querySelector("canvas");
+const c = canvas.getContext("2d");
 
-<script>
-const canvas = document.getElementById("myCanvas");
-const ctx = canvas.getContext("2d");
+canvas.width = innerWidth;
+canvas.height = innerHeight;
 
-// Define Circle class
+var mouse= {
+    x : undefined,
+    y :undefined,
+}
+
+window.addEventListener("mousemove" , function(e){
+    mouse.x = e.x;
+    mouse.y = e.y;
+})
 class Circle {
-    constructor(x, y, radius, dx, dy, color) {
+    constructor(x, y, dx, dy, radius, color) {
         this.x = x;
         this.y = y;
-        this.radius = radius;
         this.dx = dx;
         this.dy = dy;
+        this.radius = radius;
         this.color = color;
     }
-
     draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-        ctx.closePath();
+        c.beginPath();
+        c.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+        c.fillStyle = this.color;
+        c.fill();
+        c.stroke();
     }
-
     update() {
-        this.x += this.dx;
-        this.y += this.dy;
-
-        // Check collision with walls
         if (this.x + this.radius > canvas.width || this.x - this.radius < 0) {
             this.dx = -this.dx;
         }
         if (this.y + this.radius > canvas.height || this.y - this.radius < 0) {
             this.dy = -this.dy;
         }
+        this.x += this.dx;
+        this.y += this.dy;
+        this.draw();
     }
 }
 
-// Create two circles
-const circle1 = new Circle(100, 300, 50, 2, 1, "blue");
-const circle2 = new Circle(600, 300, 50, -2, -1, "red");
-
-// Function to detect collision between circles
-function detectCollision(circle1, circle2) {
-    const distanceX = circle1.x - circle2.x;
-    const distanceY = circle1.y - circle2.y;
-    const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-
-    if (distance < circle1.radius + circle2.radius) {
-        return true; // Collision detected
+class Drawline {
+    constructor(x, y, z, k) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.k = k;
     }
-
-    return false; // No collision
+    draw() {
+        c.beginPath();
+        c.moveTo(this.x, this.y);
+        c.lineTo(this.z, this.k);
+        c.stroke();
+    }
+    update() {
+        this.draw();
+    }
+}
+var colors = ["#F29F05", "#0A3A40", "#0F5959", "#F20505", "#107361"];
+var circles = [];
+function checkcollision(circle_a, circle_b) {
+    let a = Math.pow(circle_a.x - circle_b.x, 2);
+    let b = Math.pow(circle_a.y - circle_b.y, 2);
+    let c = Math.sqrt(a + b);
+    let totalradius = circle_a.radius + circle_b.radius;
+    if (c < totalradius) {
+        return true;
+    }
+}
+function checkcollisionwithmouse(circle,mouse){
+    if(mouse.x - circle.x < 80){
+        return true;
+    }
 }
 
 // Function to handle elastic collision
@@ -91,40 +100,46 @@ function handleCollision(circle1, circle2) {
     }
 
     // Calculate impulse scalar
-    const impulse = -2 * velAlongNormal / (1 / circle1.radius + 1 / circle2.radius);
+    const impulse =
+        (-2 * velAlongNormal) / (1 / circle1.radius + 1 / circle2.radius);
 
     // Apply impulse to circles
-    circle1.dx -= impulse / circle1.radius * unitNormalX;
-    circle1.dy -= impulse / circle1.radius * unitNormalY;
-    circle2.dx += impulse / circle2.radius * unitNormalX;
-    circle2.dy += impulse / circle2.radius * unitNormalY;
+    circle1.dx -= (impulse / circle1.radius) * unitNormalX;
+    circle1.dy -= (impulse / circle1.radius) * unitNormalY;
+    circle2.dx += (impulse / circle2.radius) * unitNormalX;
+    circle2.dy += (impulse / circle2.radius) * unitNormalY;
 }
 
-// Update function
-function update() {
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw circles
-    circle1.draw();
-    circle2.draw();
-
-    // Update circles
-    circle1.update();
-    circle2.update();
-
-    // Check for collision
-    if (detectCollision(circle1, circle2)) {
-        // Handle elastic collision
-        handleCollision(circle1, circle2);
+function init() {
+    for (let i = 0; i < 10; i++) {
+        var radius = 30;
+        var x = Math.random() * (window.innerWidth - radius * 2) + radius;
+        var y = Math.random() * (window.innerHeight - radius * 2) + radius;
+        var dx = Math.round(Math.random() * 5 + 1);
+        var dy = Math.round(Math.random() * 5 + 1);
+        var colorIndex = Math.floor(Math.random() * colors.length);
+        var color = colors[colorIndex];
+        var circle = new Circle(x, y, dx, dy, radius, color);
+        circles.push(circle);
     }
-
-    // Request animation frame
-    requestAnimationFrame(update);
 }
+function animate() {
+    requestAnimationFrame(animate);
+    c.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < circles.length; i++) {
+        circles[i].update();
+    }
+    for (let i = 0; i < circles.length; i++) {
+        for (let j = i + 1; j < circles.length; j++) {
+            if (checkcollision(circles[i], circles[j])) {
+                handleCollision(circles[i], circles[j]);
+            }
+        }
+        if(checkcollisionwithmouse(circles[i] , mouse)){
+            circles[i].color = "black"
+        }
 
-// Start the animation loop
-update();
-</script>
-</body>
-</html>
+    }
+}
+init();
+animate();
