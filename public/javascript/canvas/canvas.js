@@ -1,12 +1,21 @@
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
-canvas.width = innerWidth;
-canvas.height = innerHeight;
+canvas.width = 800;
+canvas.height = 500;
+const gamerow = 4;
+const rowWidth = 50;
+const rowHeight = 50 ;
+var gameover = false;
+const wincondition = 3 ;
+var mouse = {
+    x: undefined,
+    y: undefined,
+};
+var currentplayer = "o";
 var player = {
     player1: { x: undefined, y: undefined },
     player2: { x: undefined, y: undefined }
 };
-var currentplayer = 0;
 class DrawLine {
     constructor(x, y, z, k) {
         this.x = x;
@@ -40,96 +49,89 @@ class DrawCircle {
     }
 }
 class Tictactoe {
-    constructor(gamerow) {
+    constructor(gamerow , currentplayer) {
         this.gamerow = gamerow;
         this.Board = [];
+        this.currentplayer= currentplayer;
     }
     CreateBroad() {
         for (let i = 0; i < this.gamerow - 1; i++) {
             this.Board[i] = [];
             for (let j = 0; j < this.gamerow - 1; j++) {
-                this.Board[i][j] = 0;
+                this.Board[i][j] = undefined;
             }
         }
     }
     checkHorizontal() {
-        var iswin = false;
         var count = 0;
         for (let i = 0; i < this.Board.length; i++) {
             for (let j = 0; j < this.Board.length; j++) {
-                if (this.Board[i][j] == 1) {
+                if (this.Board[i][j] === this.currentplayer) {
                     count += 1;
-                } else {
-                    if (count == 3) {
-                        iswin = true;
-                    } else {
-                        count = 0;
-                    }
+                }
+                else{
+                    count = 0 ;
+                }
+                if (count === wincondition) {
+                    return true;
                 }
             }
         }
-        return iswin;
     }
     checkVertical() {
+        console.log(this.currentplayer);
         var count = 0;
         for (let i = 0; i < this.Board.length; i++) {
             for (let j = 0; j < this.Board.length; j++) {
-                if (this.Board[j][i] == 1) {
+                if (this.Board[j][i] === this.currentplayer) {
                     count += 1;
                 }
-                else {
-                    if (count == 3) {
-                        return true;
-                    } else {
-                        count = 0;
-                    }
+                else{
+                    count = 0 ;
                 }
+                if(count === wincondition){
+                    return true;
+                }
+
             }
         }
     }
     checkmaindiagonal() {
         var count = 0;
         for (let i = 0; i < this.Board.length; i++) {
-            if (this.Board[i][i] == 1) {
+            if (this.Board[i][i] === this.currentplayer) {
                 count += 1;
             } else {
                 count = 0;
             }
-            // check if cn
-            if (count == 3) {
+            if (count == wincondition) {
+                console.log("main");
                 return true;
             }
         }
-        // Trả về false nếu không tìm thấy chuỗi ba "1" liên tiếp
-        return false;
     }
-
-    checksub() {
+    checksub(){
         var count = 0;
         for (let i = 0; i < this.Board.length; i++) {
-            if (this.Board[i][this.gamerow - i - 1] == 1) { // Sửa gamerow thành this.gamerow
+            if (this.Board[i][this.gamerow - i - 2] === this.currentplayer) {
                 count += 1;
             } else {
                 count = 0;
             }
-            // Kiểm tra ngay khi đếm đủ 3
-            if (count == 3) {
+            if (count == wincondition) {
                 return true;
             }
         }
-        // Trả về false nếu không tìm thấy chuỗi ba "1" liên tiếp
-        return false;
     }
-
     checkwinner() {
-        console.log(this.checksub());
         if (
             this.checkHorizontal() ||
             this.checkVertical() ||
             this.checkmaindiagonal() ||
             this.checksub()
+
         ) {
-            console.log("win");
+            return true;
         }
     }
     showBroad() {
@@ -137,48 +139,57 @@ class Tictactoe {
         return this.Board;
     }
 }
-var mouse = {
-    x: undefined,
-    y: undefined,
-};
-const gamerow = 4;
-const rowWidth = 100;
 for (let i = 1; i <= gamerow; i++) {
-    var line = new DrawLine(100, 100 * i, 400, 100 * i);
+    var line = new DrawLine(rowHeight, rowHeight * i, gamerow*rowWidth, rowHeight * i);
     line.Drawline();
-    var line2 = new DrawLine(100 * i, 100, 100 * i, 400);
+    var line2 = new DrawLine(rowHeight * i, rowHeight, rowHeight * i, gamerow*rowWidth);
     line2.Drawline();
 }
 //create board
-var game = new Tictactoe(gamerow);
+var game = new Tictactoe(gamerow , currentplayer);
 var board = game.showBroad();
 function drawX(posx, posy) {
-    c.font = "60px Arial";
+    c.font = "50px Arial";
     c.fillText("X", posx, posy);
 }
 function drawO(posx, posy) {
-    c.font = "60px Arial";
+    c.font = "50px Arial";
     c.fillText("0", posx, posy);
 }
+function drawwineer(winner) {
+    c.font = "60px Arial";
+    c.fillText(`${winner} win`, 190, 260);
+}
+
 window.addEventListener("click", function (e) {
+    if (gameover) {
+        return ;
+    }
     mouse.x = e.x;
     mouse.y = e.y;
-    console.log(mouse);
-    var positionx = Math.floor((mouse.y - 100) / rowWidth);
-    var positiony = Math.floor((mouse.x - 100) / rowWidth);
-    board[positionx][positiony] = 1;
-    var posx = Math.floor(mouse.x / 100) * 100 + 30;
-    var posy = Math.floor(mouse.y / 100) * 100 + 70;
-    game.checkwinner();
-
-    if (currentplayer == 0) {
-        drawX(posx, posy);
-        currentplayer = 1;
+    var positionx = Math.floor((mouse.y - rowHeight) / rowWidth);
+    var positiony = Math.floor((mouse.x - rowHeight) / rowHeight);
+    console.log(positionx);
+    var posx = Math.floor(mouse.x / rowHeight) * rowHeight + 10;
+    var posy = Math.floor(mouse.y / rowHeight) * rowHeight + 45;
+    if (board[positionx][positiony] === undefined) {
+        board[positionx][positiony] = currentplayer
+        board.currentplayer = currentplayer;
+        if (currentplayer === "x") {
+            drawX(posx, posy);
+            currentplayer = "o";
+        }
+        else{
+            drawO(posx , posy);
+            currentplayer = "x"
+        };
+        if(game.checkwinner()){
+            drawwineer(currentplayer)
+            gameover = true;
+        };
+        console.log(game);
     }
-    else{
-        drawO(posx , posy);
-        currentplayer = 0
-    };
 });
 
 
+//current player always be O
