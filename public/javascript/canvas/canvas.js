@@ -65,57 +65,71 @@ class Tictactoe {
         }
     }
     checkHorizontal() {
-        console.log(this.Board.length);
+
         var count = 0;
         for (let i = 0; i < this.Board.length; i++) {
             for (let j = 0; j < this.Board.length; j++) {
                 if (this.Board[i][j] === this.currentplayer) {
                     count += 1;
+                    if (count >= wincondition) {
+                        console.log("checkHorizontal");
+                        return true;
+                    }
                 } else {
                     count = 0;
                 }
-                if (count === wincondition) {
-                    return true;
-                }
+
             }
         }
     }
     checkVertical() {
-        var count = 0;
         for (let i = 0; i < this.Board.length; i++) {
+            let count = 0;
             for (let j = 0; j < this.Board.length; j++) {
                 if (this.Board[j][i] === this.currentplayer) {
-                    count += 1;
+                    count++;
+                    if (count >= wincondition) {
+                        console.log("checkVertical");
+                        return true;
+                    }
                 } else {
                     count = 0;
-                }
-                if (count === wincondition) {
-                    return true;
                 }
             }
         }
     }
-    checkDiagonals() {
+
+    checkmainDiagonal() {
         var count1 = 0;
         for (let i = 0; i < this.Board.length; i++) {
             if (this.Board[i][i] === this.currentplayer) {
-                console.log(`gia tri = ${this.Board[i][i]} ,tai  i = ${i}  `);
-                console.log(this.Board);
                 count1 += 1;
+                if(count1 >= wincondition){
+                    console.log("checkmainDiagonal");
+
+                    return true ;
+                }
+
             } else {
                 count1 = 0;
             }
         }
+
+
+    }
+    checksubdiagonal(){
         var count2 = 0;
-        for (let i = 0; i < this.Board.length-1; i++) {
-            if (this.Board[i][this.gamesize - i - 1] === this.currentplayer) {
+        for (let j = 0; j < this.Board.length; j++) {
+            if (this.Board[j][this.gamesize - j - 1] === this.currentplayer) {
                 count2 += 1;
+                if (count2 >= wincondition) {
+                    console.log("checksubdiagonal");
+
+                    return true
+                }
             } else {
                 count2 = 0;
             }
-        }
-        if (count1 === wincondition || count2 === wincondition) {
-            return true;
         }
     }
 
@@ -123,7 +137,8 @@ class Tictactoe {
         if (
             this.checkHorizontal() ||
             this.checkVertical()||
-            this.checkDiagonals()
+            this.checkmainDiagonal() ||
+            this.checksubdiagonal()
         ) {
             return true;
         }
@@ -137,7 +152,7 @@ var startx = 50;
 var starty = 50;
 var lastpointx = 50;
 var lastpointy = 50;
-var displaysize = 10;
+var displaysize = 4;
 
 var gamesize = displaysize - 1;
 var rowsize = 50;
@@ -202,13 +217,7 @@ window.addEventListener("click", function (e) {
             currentplayer = "x";
         }
 
+
     }
 });
 
-var test = []
-for (let i = 0; i < this.gamesize; i++) {
-    this.test[i] = [];
-    for (let j = 0; j < this.gamesize; j++) {
-        this.test[i][j] = undefined;
-    }
-}
