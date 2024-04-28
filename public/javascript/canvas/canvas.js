@@ -121,18 +121,35 @@ class Tictactoe {
     checkfromleft(){
         for (let i = 0; i < this.Board.length; i++) {
             if(this.checkfromPosition(i , 0 , 1 , 1)) {
+                console.log("check main tren ");
                 return true;
             }
             if(this.checkfromPosition(0 , i , 1, 1)){
+                console.log("check main duoi ");
+
                 return true;
             }
         }
+    }
+    checkfromright(){
+        for (let i = 0; i < this.Board.length; i++) {
+           if(this.checkfromPosition(0 , this.Board.length - i-1 , 1 , -1 )){
+            console.log("check sub tren");
+                return true;
+           }
+           if(this.checkfromPosition(i , this.Board.length -1 , 1 , -1 )){
+            console.log("check sub duoi");
+            return true;
+       }
+        }
+
     }
     checkwinner() {
         if (
             this.checkHorizontal() ||
             this.checkVertical()||
-            this.checkfromleft()
+            this.checkfromleft() ||
+            this.checkfromright()
 
         ) {
             return true;
@@ -147,7 +164,7 @@ var startx = 50;
 var starty = 50;
 var lastpointx = 50;
 var lastpointy = 50;
-var displaysize = 10;
+var displaysize = 9;
 
 var gamesize = displaysize - 1;
 var rowsize = 50;
@@ -190,6 +207,7 @@ window.addEventListener("click", function (e) {
     if (gameover) {
         return;
     }
+    game.checkfromright()
     mouse.x = e.x;
     mouse.y = e.y;
     var positionx = Math.floor((mouse.y - startx) / rowsize);
@@ -206,7 +224,6 @@ window.addEventListener("click", function (e) {
         if (currentplayer === "x") {
             drawX(posx, posy);
             currentplayer = "o";
-
         } else {
             drawO(posx, posy);
             currentplayer = "x";
@@ -215,24 +232,3 @@ window.addEventListener("click", function (e) {
 
     }
 });
-
-// var array = [
-
-// ];
-
-// for (let i = 0; i < 8; i++) {
-//     array[i] = [];
-//     for (let j = 0; j <8 ; j++) {
-//         array[i][j]= i;
-//     }
-// }
-// let sx  = 1;
-// let sy  = 1;
-// let count = 0 ;
-// x = 0 ; i = 0;
-// while(x >= 0 && x <array.length && y >= 0 && y < array.length){
-//     console.log(array[x][i]);
-//     x+= sx ;
-//     y += sy;
-
-// }
