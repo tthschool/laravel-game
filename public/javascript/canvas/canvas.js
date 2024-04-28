@@ -65,9 +65,8 @@ class Tictactoe {
         }
     }
     checkHorizontal() {
-
-        var count = 0;
         for (let i = 0; i < this.Board.length; i++) {
+            var count = 0;
             for (let j = 0; j < this.Board.length; j++) {
                 if (this.Board[i][j] === this.currentplayer) {
                     count += 1;
@@ -99,49 +98,74 @@ class Tictactoe {
         }
     }
 
-    checkmainDiagonal() {
-        var count1 = 0;
+    checkfromPosition(i , j , stepX , stepY){
+        let sx  = stepX;
+        let sy  = stepY;
+        let x =  i;
+        let y = j;
+        let count = 0 ;
+        while(x >= 0 && x <this.Board.length && y >= 0 && y < this.Board.length){
+            if(this.Board[x][y] === this.currentplayer){
+                count += 1 ;
+                if(count >= wincondition ){
+                    return true;
+                }
+            }
+            else{
+                count = 0 ;
+            }
+            x+= sx ;
+            y += sy;
+        }
+    }
+    checkfromleft(){
         for (let i = 0; i < this.Board.length; i++) {
-            if (this.Board[i][i] === this.currentplayer) {
-                count1 += 1;
-                if(count1 >= wincondition){
-                    console.log("checkmainDiagonal");
-
-                    return true ;
-                }
-
-            } else {
-                count1 = 0;
+            if(this.checkfromPosition(i , 0 , 1 , 1)) {
+                console.log("check main tren ");
+                return true;
             }
-        }
+            if(this.checkfromPosition(0 , i , 1, 1)){
+                console.log("check main duoi ");
 
-
-    }
-    checksubdiagonal(){
-        var count2 = 0;
-        for (let j = 0; j < this.Board.length; j++) {
-            if (this.Board[j][this.gamesize - j - 1] === this.currentplayer) {
-                count2 += 1;
-                if (count2 >= wincondition) {
-                    console.log("checksubdiagonal");
-
-                    return true
-                }
-            } else {
-                count2 = 0;
+                return true;
             }
         }
     }
+    checkfromright(){
+        for (let i = 0; i < this.Board.length; i++) {
+           if(this.checkfromPosition(0 , this.Board.length - i-1 , 1 , -1 )){
+            console.log("check sub tren");
+                return true;
+           }
+           if(this.checkfromPosition(i , this.Board.length -1 , 1 , -1 )){
+            console.log("check sub duoi");
+            return true;
+       }
+        }
 
+    }
     checkwinner() {
         if (
             this.checkHorizontal() ||
             this.checkVertical()||
-            this.checkmainDiagonal() ||
-            this.checksubdiagonal()
+            this.checkfromleft() ||
+            this.checkfromright()
+
         ) {
             return true;
         }
+    }
+    checkdraw(){
+        for (let i = 0; i < this.Board.length; i++) {
+            for (let j = 0; j < this.Board.length; j++) {
+                if (this.Board[i][j]===null) {
+                    return false ;
+                }
+            }
+
+        }
+        return true;
+
     }
     showBroad() {
         this.CreateBroad();
@@ -190,6 +214,11 @@ function drawwineer(winner) {
     c.fillStyle = "black";
     c.fillText(`${winner} win`, 190, 260);
 }
+function draw(){
+    c.font = "100px Arial";
+    c.fillStyle = "black";
+    c.fillText("draw", 190, 260);
+}
 
 window.addEventListener("click", function (e) {
     if (gameover) {
@@ -208,10 +237,13 @@ window.addEventListener("click", function (e) {
             drawwineer(currentplayer);
             gameover = true;
         }
+        else if(game.checkdraw()){
+            draw();
+            return;
+        }
         if (currentplayer === "x") {
             drawX(posx, posy);
             currentplayer = "o";
-
         } else {
             drawO(posx, posy);
             currentplayer = "x";
@@ -220,4 +252,3 @@ window.addEventListener("click", function (e) {
 
     }
 });
-
