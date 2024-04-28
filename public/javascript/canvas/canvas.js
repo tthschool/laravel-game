@@ -65,7 +65,6 @@ class Tictactoe {
         }
     }
     checkHorizontal() {
-
         var count = 0;
         for (let i = 0; i < this.Board.length; i++) {
             for (let j = 0; j < this.Board.length; j++) {
@@ -99,46 +98,42 @@ class Tictactoe {
         }
     }
 
-    checkmainDiagonal() {
-        var count1 = 0;
+    checkfromPosition(i , j , stepX , stepY){
+        let sx  = stepX;
+        let sy  = stepY;
+        let x =  i;
+        let y = j;
+        let count = 0 ;
+        while(x >= 0 && x <this.Board.length && y >= 0 && y < this.Board.length){
+            if(this.Board[x][y] === this.currentplayer){
+                count += 1 ;
+                if(count >= wincondition ){
+                    return true;
+                }
+            }
+            else{
+                count = 0 ;
+            }
+            x+= sx ;
+            y += sy;
+        }
+    }
+    checkfromleft(){
         for (let i = 0; i < this.Board.length; i++) {
-            if (this.Board[i][i] === this.currentplayer) {
-                count1 += 1;
-                if(count1 >= wincondition){
-                    console.log("checkmainDiagonal");
-
-                    return true ;
-                }
-
-            } else {
-                count1 = 0;
+            if(this.checkfromPosition(i , 0 , 1 , 1)) {
+                return true;
             }
-        }
-
-
-    }
-    checksubdiagonal(){
-        var count2 = 0;
-        for (let j = 0; j < this.Board.length; j++) {
-            if (this.Board[j][this.gamesize - j - 1] === this.currentplayer) {
-                count2 += 1;
-                if (count2 >= wincondition) {
-                    console.log("checksubdiagonal");
-
-                    return true
-                }
-            } else {
-                count2 = 0;
+            if(this.checkfromPosition(0 , i , 1, 1)){
+                return true;
             }
         }
     }
-
     checkwinner() {
         if (
             this.checkHorizontal() ||
             this.checkVertical()||
-            this.checkmainDiagonal() ||
-            this.checksubdiagonal()
+            this.checkfromleft()
+
         ) {
             return true;
         }
@@ -152,7 +147,7 @@ var startx = 50;
 var starty = 50;
 var lastpointx = 50;
 var lastpointy = 50;
-var displaysize = 4;
+var displaysize = 10;
 
 var gamesize = displaysize - 1;
 var rowsize = 50;
@@ -221,3 +216,23 @@ window.addEventListener("click", function (e) {
     }
 });
 
+// var array = [
+
+// ];
+
+// for (let i = 0; i < 8; i++) {
+//     array[i] = [];
+//     for (let j = 0; j <8 ; j++) {
+//         array[i][j]= i;
+//     }
+// }
+// let sx  = 1;
+// let sy  = 1;
+// let count = 0 ;
+// x = 0 ; i = 0;
+// while(x >= 0 && x <array.length && y >= 0 && y < array.length){
+//     console.log(array[x][i]);
+//     x+= sx ;
+//     y += sy;
+
+// }
