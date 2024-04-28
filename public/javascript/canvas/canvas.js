@@ -71,13 +71,11 @@ class Tictactoe {
                 if (this.Board[i][j] === this.currentplayer) {
                     count += 1;
                     if (count >= wincondition) {
-                        console.log("checkHorizontal");
                         return true;
                     }
                 } else {
                     count = 0;
                 }
-
             }
         }
     }
@@ -88,7 +86,6 @@ class Tictactoe {
                 if (this.Board[j][i] === this.currentplayer) {
                     count++;
                     if (count >= wincondition) {
-                        console.log("checkVertical");
                         return true;
                     }
                 } else {
@@ -98,88 +95,82 @@ class Tictactoe {
         }
     }
 
-    checkfromPosition(i , j , stepX , stepY){
-        let sx  = stepX;
-        let sy  = stepY;
-        let x =  i;
+    checkfromPosition(i, j, stepX, stepY) {
+        let sx = stepX;
+        let sy = stepY;
+        let x = i;
         let y = j;
-        let count = 0 ;
-        while(x >= 0 && x <this.Board.length && y >= 0 && y < this.Board.length){
-            if(this.Board[x][y] === this.currentplayer){
-                count += 1 ;
-                if(count >= wincondition ){
+        let count = 0;
+        while (
+            x >= 0 &&
+            x < this.Board.length &&
+            y >= 0 &&
+            y < this.Board.length
+        ) {
+            if (this.Board[x][y] === this.currentplayer) {
+                count += 1;
+                if (count >= wincondition) {
                     return true;
                 }
+            } else {
+                count = 0;
             }
-            else{
-                count = 0 ;
-            }
-            x+= sx ;
+            x += sx;
             y += sy;
         }
     }
-    checkfromleft(){
+    checkfromleft() {
         for (let i = 0; i < this.Board.length; i++) {
-            if(this.checkfromPosition(i , 0 , 1 , 1)) {
-                console.log("check main tren ");
+            if (this.checkfromPosition(i, 0, 1, 1)) {
                 return true;
             }
-            if(this.checkfromPosition(0 , i , 1, 1)){
-                console.log("check main duoi ");
-
+            if (this.checkfromPosition(0, i, 1, 1)) {
                 return true;
             }
         }
     }
-    checkfromright(){
+    checkfromright() {
         for (let i = 0; i < this.Board.length; i++) {
-           if(this.checkfromPosition(0 , this.Board.length - i-1 , 1 , -1 )){
-            console.log("check sub tren");
+            if (this.checkfromPosition(0, this.Board.length - i - 1, 1, -1)) {
                 return true;
-           }
-           if(this.checkfromPosition(i , this.Board.length -1 , 1 , -1 )){
-            console.log("check sub duoi");
-            return true;
-       }
+            }
+            if (this.checkfromPosition(i, this.Board.length - 1, 1, -1)) {
+                return true;
+            }
         }
-
     }
     checkwinner() {
         if (
             this.checkHorizontal() ||
-            this.checkVertical()||
+            this.checkVertical() ||
             this.checkfromleft() ||
             this.checkfromright()
-
         ) {
             return true;
         }
     }
-    checkdraw(){
+    checkdraw() {
         for (let i = 0; i < this.Board.length; i++) {
             for (let j = 0; j < this.Board.length; j++) {
-                if (this.Board[i][j]===null) {
-                    return false ;
+                if (this.Board[i][j] === null) {
+                    return false;
                 }
             }
-
         }
         return true;
-
     }
     showBroad() {
         this.CreateBroad();
         return this.Board;
     }
 }
-var startx = 50;
-var starty = 50;
+const startx = 50;
+const starty = 50;
+const displaysize = 4;
+const gamesize = displaysize - 1;
+const rowsize = 50;
 var lastpointx = 50;
 var lastpointy = 50;
-var displaysize = 4;
-
-var gamesize = displaysize - 1;
-var rowsize = 50;
 for (let i = 1; i <= displaysize; i++) {
     var line = new DrawLine(
         startx,
@@ -192,34 +183,30 @@ for (let i = 1; i <= displaysize; i++) {
         startx * i,
         starty,
         lastpointx * i,
-        lastpointy * displaysize,
+        lastpointy * displaysize
     );
     line2.update();
 }
 //create board
 var game = new Tictactoe(gamesize);
 var board = game.showBroad();
-function drawX(posx, posy) {
-    c.font = "50px Arial";
-    c.fillStyle = "red";
-    c.fillText("x", posx, posy);
+class drawText {
+    constructor(px, py, cr, t) {
+        this.posx = px;
+        this.posy = py;
+        this.color = cr;
+        this.text = t;
+    }
+    draw() {
+        c.font = "50px Arial";
+        c.fillStyle = this.color;
+        c.fillText(this.text, this.posx, this.posy);
+    }
 }
-function drawO(posx, posy) {
-    c.font = "50px Arial";
-    c.fillStyle = "blue";
-    c.fillText("o", posx, posy);
+function drawtextfunction(posx, posy, color, text) {
+    let draw = new drawText(posx, posy, color, text);
+    return draw;
 }
-function drawwineer(winner) {
-    c.font = "100px Arial";
-    c.fillStyle = "black";
-    c.fillText(`${winner} win`, 190, 260);
-}
-function draw(){
-    c.font = "100px Arial";
-    c.fillStyle = "black";
-    c.fillText("draw", 190, 260);
-}
-
 window.addEventListener("click", function (e) {
     if (gameover) {
         return;
@@ -234,21 +221,19 @@ window.addEventListener("click", function (e) {
         board[positionx][positiony] = currentplayer;
         game.currentplayer = currentplayer;
         if (game.checkwinner()) {
-            drawwineer(currentplayer);
+            drawtextfunction(190, 260, "black", `${currentplayer} win`).draw();
             gameover = true;
         }
         else if(game.checkdraw()){
-            draw();
-            return;
+            drawtextfunction(190, 260, "black", "DRAW").draw();
+            gameover = true;
         }
         if (currentplayer === "x") {
-            drawX(posx, posy);
+            drawtextfunction(posx, posy, "blue", `${currentplayer}`).draw();
             currentplayer = "o";
         } else {
-            drawO(posx, posy);
+            drawtextfunction(posx, posy, "red", `${currentplayer}`).draw();
             currentplayer = "x";
         }
-
-
     }
 });
