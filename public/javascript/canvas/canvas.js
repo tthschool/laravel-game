@@ -65,8 +65,8 @@ class Tictactoe {
         }
     }
     checkHorizontal() {
-        var count = 0;
         for (let i = 0; i < this.Board.length; i++) {
+            var count = 0;
             for (let j = 0; j < this.Board.length; j++) {
                 if (this.Board[i][j] === this.currentplayer) {
                     count += 1;
@@ -155,6 +155,18 @@ class Tictactoe {
             return true;
         }
     }
+    checkdraw(){
+        for (let i = 0; i < this.Board.length; i++) {
+            for (let j = 0; j < this.Board.length; j++) {
+                if (this.Board[i][j]===null) {
+                    return false ;
+                }
+            }
+
+        }
+        return true;
+
+    }
     showBroad() {
         this.CreateBroad();
         return this.Board;
@@ -164,7 +176,7 @@ var startx = 50;
 var starty = 50;
 var lastpointx = 50;
 var lastpointy = 50;
-var displaysize = 9;
+var displaysize = 4;
 
 var gamesize = displaysize - 1;
 var rowsize = 50;
@@ -202,12 +214,16 @@ function drawwineer(winner) {
     c.fillStyle = "black";
     c.fillText(`${winner} win`, 190, 260);
 }
+function draw(){
+    c.font = "100px Arial";
+    c.fillStyle = "black";
+    c.fillText("draw", 190, 260);
+}
 
 window.addEventListener("click", function (e) {
     if (gameover) {
         return;
     }
-    game.checkfromright()
     mouse.x = e.x;
     mouse.y = e.y;
     var positionx = Math.floor((mouse.y - startx) / rowsize);
@@ -220,6 +236,10 @@ window.addEventListener("click", function (e) {
         if (game.checkwinner()) {
             drawwineer(currentplayer);
             gameover = true;
+        }
+        else if(game.checkdraw()){
+            draw();
+            return;
         }
         if (currentplayer === "x") {
             drawX(posx, posy);
