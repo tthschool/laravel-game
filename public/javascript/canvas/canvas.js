@@ -3,17 +3,12 @@ const c = canvas.getContext("2d");
 canvas.width = 800;
 canvas.height = 500;
 
-var gameover = false;
 const wincondition = 3;
 var mouse = {
     x: undefined,
     y: undefined,
 };
-var currentplayer = "o";
-var player = {
-    player1: { x: undefined, y: undefined },
-    player2: { x: undefined, y: undefined },
-};
+var currentplayer = "x";
 
 class DrawLine {
     constructor(x, y, z, k) {
@@ -190,6 +185,7 @@ for (let i = 1; i <= displaysize; i++) {
 //create board
 var game = new Tictactoe(gamesize);
 var board = game.showBroad();
+console.log(board);
 class drawText {
     constructor(px, py, cr, t) {
         this.posx = px;
@@ -207,6 +203,14 @@ function drawtextfunction(posx, posy, color, text) {
     let draw = new drawText(posx, posy, color, text);
     return draw;
 }
+
+function getRandomNumber(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+function check() {
+    return game.checkwinner();
+}
+var gameover = false;
 window.addEventListener("click", function (e) {
     if (gameover) {
         return;
@@ -220,20 +224,43 @@ window.addEventListener("click", function (e) {
     if (board[positionx][positiony] === null) {
         board[positionx][positiony] = currentplayer;
         game.currentplayer = currentplayer;
+        drawtextfunction(posx, posy, "blue", `${currentplayer}`).draw();
         if (game.checkwinner()) {
-            drawtextfunction(190, 260, "black", `${currentplayer} win`).draw();
+            drawtextfunction(190, 200, "black", `${currentplayer} win`).draw();
             gameover = true;
-        }
-        else if(game.checkdraw()){
-            drawtextfunction(190, 260, "black", "DRAW").draw();
-            gameover = true;
-        }
-        if (currentplayer === "x") {
-            drawtextfunction(posx, posy, "blue", `${currentplayer}`).draw();
-            currentplayer = "o";
+        } else if (game.checkdraw()) {
+            drawtextfunction(190, 200, "black", `draw`).draw();
         } else {
-            drawtextfunction(posx, posy, "red", `${currentplayer}`).draw();
-            currentplayer = "x";
+            currentplayer = "o";
+            aimove();
         }
     }
 });
+function aimove() {
+    let done = false;
+    while (!done && !gameover) {
+        let x = getRandomNumber(0, gamesize - 1);
+        let y = getRandomNumber(0, gamesize - 1);
+        if (board[y][x] === null) {
+            board[y][x] = currentplayer; // AI places its mark
+            game.currentplayer = currentplayer;//this is importaint line
+            let computerx = x * rowsize + 60;
+            let computery = y * rowsize + 95;
+            drawtextfunction(computerx, computery, "red", currentplayer).draw();
+            console.log(game);
+            if (game.checkwinner()) {
+                drawtextfunction(
+                    190,
+                    200,
+                    "black",
+                    `${currentplayer} wins!`
+                ).draw();
+            } else if (game.checkdraw()) {
+                drawtextfunction(190, 200, "black", `draw`).draw();
+            } else {
+                currentplayer = "x";
+            }
+            done = true;
+        }
+    }
+}
